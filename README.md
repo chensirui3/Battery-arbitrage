@@ -39,7 +39,7 @@ decision, and each model fit, see only data that was public at the time.
   earned −$1.3/kW-year [−4.2, +1.3] against re-planning on day-ahead prices, and the look-ahead
   −$2.6 [−6.5, +0.5].
 - **Better forecasts did not mean more revenue.** Probabilistic forecasts cut the first hour's
-  forecast error (CRPS) by up to 40% against day-ahead prices, and the spike classifier's ROC
+  forecast error (CRPS) by up to 42% against day-ahead prices, and the spike classifier's ROC
   AUC is 0.96. Yet every planner that acted on information beyond day-ahead prices earned the
   same or less. Trading on small everyday edges pays about 15% in round-trip losses plus
   $10/MWh of wear each time.
@@ -240,7 +240,7 @@ since each refit sees only the two years before it.
     hubs. Knowing only when they come, with a typical size, is worth $5.4. From 2024 on,
     spikes carry less of it: $3.8 of $8.0 across the hubs.
 - **Probabilistic forecasts are much better than the DA price by proper scores.**
-  - Quantile LightGBM cuts CRPS by 40% in the first hour and by 25–30% further out. With
+  - Quantile LightGBM cuts CRPS by 40% in the first hour and by 25–31% further out. With
     conformal calibration, its ranges hold about as much of the outcome as they should.
   - Analog ensembles score almost as well, but are overconfident: 71% of prices fall inside the
     80% range. The 20 most similar past days vary less than reality.

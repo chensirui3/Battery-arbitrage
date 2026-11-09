@@ -99,6 +99,12 @@ def money(value: float, digits: int = 1) -> str:
     return f"{value:+,.{digits}f}".replace("-", "\N{MINUS SIGN}")
 
 
+def usd(value: float, digits: int = 1) -> str:
+    """A signed dollar amount for st.markdown, which reads a pair of bare $ signs as math."""
+    sign = "+" if value >= 0 else "\N{MINUS SIGN}"
+    return f"{sign}\\${abs(value):,.{digits}f}"
+
+
 def hour_axis(hours: float = 24) -> alt.Axis:
     """Clock times on an ordinary day; plain hour counts on a day the clocks change."""
     if hours == 24:
@@ -355,16 +361,18 @@ with overview:
         "- Re-planning every 15 minutes on day-ahead prices is the policy to beat. No policy that "
         "uses only published data beat it detectably.\n"
         f"- The missing revenue is in the next few hours, mostly in spikes. Averaged over the "
-        f"five hubs, knowing the next hour is worth {money(tests.at['mpc_oracle_1h', 'mean'])}"
+        f"five hubs, knowing the next hour is worth \\${tests.at['mpc_oracle_1h', 'mean']:.1f}"
         f"/kW-year more than the baseline, and knowing only its spikes "
-        f"{money(tests.at['mpc_oracle_spike', 'mean'])}.\n"
-        f"- Two attempts were tested in comparisons fixed before running, and failed: a spike "
-        f"nowcast ({money(tests.at['mpc_spike', 'mean'])} [{money(tests.at['mpc_spike', 'low'])}, "
-        f"{money(tests.at['mpc_spike', 'high'])}]) and ERCOT's own one-hour look-ahead "
-        f"({money(tests.at['mpc_rtd', 'mean'])} [{money(tests.at['mpc_rtd', 'low'])}, "
+        f"\\${tests.at['mpc_oracle_spike', 'mean']:.1f}.\n"
+        f"- Three ideas were tested in comparisons fixed before running, and none was confirmed: "
+        f"ERCOT's load, wind, and solar forecasts as model features; a spike nowcast "
+        f"({usd(tests.at['mpc_spike', 'mean'])}/kW-year [{money(tests.at['mpc_spike', 'low'])}, "
+        f"{money(tests.at['mpc_spike', 'high'])}] against the baseline); and ERCOT's own one-hour "
+        f"look-ahead ({usd(tests.at['mpc_rtd', 'mean'])} [{money(tests.at['mpc_rtd', 'low'])}, "
         f"{money(tests.at['mpc_rtd', 'high'])}]). See *Compare policies*.\n"
-        "- Both failed the same way: seeing an hour ahead, with day-ahead prices beyond it, the "
-        "battery sells into the start of a long spike. See *A day in the market*."
+        "- The spike nowcast and the look-ahead failed the same way: seeing an hour ahead, with "
+        "day-ahead prices beyond it, the battery sells into the start of a long spike. See "
+        "*A day in the market*."
     )
 
 with comparisons:
@@ -556,7 +564,8 @@ with one_day:
     for column, policy in zip(columns, series, strict=True):
         delta = None
         if policy != data.BASELINE:  # an ASCII sign, which st.metric reads for the arrow
-            delta = f"{(revenue[policy] - revenue[data.BASELINE]) / 1e3:+,.0f}k vs {data.BASELINE}"
+            gap = (revenue[policy] - revenue[data.BASELINE]) / 1e3
+            delta = f"{'-' if gap < 0 else '+'}${abs(gap):,.0f}k vs {data.BASELINE}"
         column.metric(f"{b.label(policy)}, that day", f"${revenue[policy] / 1e3:,.0f}k", delta)
 
 with forecasts:
@@ -602,9 +611,11 @@ what was public by then: RT prices 5 minutes after their interval ends, and day-
 13:30 the day before. Leakage tests replace everything published after a cutoff with noise and
 check that no earlier decision changes.
 
-**Tests fixed before running.** The spike nowcast and the look-ahead each had their open choices
-made on July to December 2021, before the test period. Their tests were then written down and
-run once on 2022–2026: [spike nowcasting]({DOCS}/spike-nowcasting-plan.md),
+**Tests fixed before running.** The comparison with ERCOT's
+[load, wind, and solar forecasts]({DOCS}/fundamentals.md) was fixed before their history was
+downloaded. The spike nowcast and the look-ahead each had their open choices made on July to
+December 2021, before the test period. Their tests were then written down and run once on
+2022–2026: [spike nowcasting]({DOCS}/spike-nowcasting-plan.md),
 [grid conditions]({DOCS}/grid-conditions-plan.md). The [write-up]({DOCS}/writeup.md) tells the
 story in one read.
 

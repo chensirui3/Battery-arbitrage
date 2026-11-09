@@ -14,11 +14,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # With the dashboard extra, the dashboard's own smoke test runs instead of being skipped.
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,dashboard]"
       - name: Lint
         run: |
-          ruff check src tests
-          ruff format --check src tests
+          ruff check src tests dashboard scripts
+          ruff format --check src tests dashboard scripts
       - name: Test
         run: pytest

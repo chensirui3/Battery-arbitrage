@@ -129,9 +129,8 @@ that come apart from the day-ahead peak, and spares it the ones that build into 
 
 ## What would come next
 
-- **A forward test.** Every test so far used 2022–2026, so a new idea needs data nobody has
-  looked at. That period becomes the development set, and a frozen candidate is scored on data
-  from November 2026 on, as it arrives.
 - **Spike duration.** How long a spike in progress will last is where every attempt failed.
+  Every test so far used 2022–2026, so a fair test of a new model needs data it has not
+  touched: the months after October 2026, or the years before 2021.
 - **Decision-focused learning.** Train forecasters on the revenue their dispatch earns, not on
   forecast error, since better forecast errors never earned more here.
