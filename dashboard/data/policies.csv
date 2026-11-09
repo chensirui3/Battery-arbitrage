@@ -1,0 +1,26 @@
+policy,group,name,description
+perfect_rt,oracle,Perfect foresight,"Realized RT prices, a month at a time"
+mpc_oracle,oracle,Knows RT prices to the DA horizon,Realized RT prices to the end of the published DA prices
+mpc_oracle_4h,oracle,Knows the next 4 hours,"Realized RT prices for the next 4 hours, DA prices after"
+mpc_oracle_1h,oracle,Knows the next hour,"Realized RT prices for the next hour, DA prices after"
+mpc_oracle_spike,oracle,Knows the next hour's spikes,"Realized RT prices for the next hour where they are spikes (more than $100/MWh from DA), DA prices elsewhere"
+mpc_oracle_timing,oracle,Knows when the next hour spikes,"Which of the next hour's intervals spike, assuming a typical spike size"
+perfect_da,oracle,Perfect day-ahead foresight,"Realized DA prices, settled at DA"
+mpc_da,baseline,Re-plans on day-ahead prices,"DA prices, re-planned every 15 minutes"
+mpc_analog,realistic,"Analog scenarios, averaged",The average of 20 analog scenarios
+mpc_spike,realistic,Spike nowcast,"DA prices, raised or lowered for the next hour by a spike nowcast while a spike is under way"
+mpc_spike_f,realistic,Spike nowcast + ERCOT's forecasts,"The spike nowcast, with ERCOT's load, wind, and solar forecasts as features"
+mpc_spike_c,realistic,Spike nowcast + grid conditions,"The spike nowcast, with real-time grid conditions as features"
+mpc_ar1,realistic,"Latest spread, decaying","DA prices plus the latest RT-DA spread, decaying"
+mpc_rtd,realistic,ERCOT's one-hour look-ahead,"ERCOT's own one-hour price look-ahead where it is more than $100/MWh from DA, DA prices elsewhere"
+mpc_gbm,realistic,LightGBM forecast,A LightGBM price forecast
+mpc_gbm_f,realistic,LightGBM + ERCOT's forecasts,"The LightGBM forecast, with ERCOT's load, wind, and solar forecasts as features"
+mpc_gbm_c,realistic,LightGBM + grid conditions,"The LightGBM forecast, with real-time grid conditions as features"
+mpc_gbm_1h,realistic,"LightGBM, next hour only","The LightGBM forecast for the next hour, DA prices after"
+smpc_analog_4h,realistic,"Stochastic MPC, 4-hour shared plan","Analog scenarios: one plan for the first 4 hours, then one per scenario"
+smpc_analog_1h,realistic,"Stochastic MPC, 1-hour shared plan","Analog scenarios: one plan for the first hour, then one per scenario"
+smpc_analog,realistic,Two-stage stochastic MPC,"Analog scenarios: one action, then one plan per scenario"
+smpc_analog_rt,realistic,Stochastic MPC from the latest spread,"Two-stage stochastic MPC, with scenarios that start from the latest RT spread"
+sdp,realistic,Stochastic dynamic programming,Stochastic dynamic programming on a Markov model of the spread
+da_informed,realistic,Plans once a day,"DA prices, in one plan a day"
+naive,realistic,Last 30 days' average shape,The last 30 days' average daily shape

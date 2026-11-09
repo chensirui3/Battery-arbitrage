@@ -1,0 +1,7 @@
+# For Streamlit Community Cloud: the dashboard reads only dashboard/data/, so it does not need
+# the batt package or its solvers.
+streamlit>=1.50
+altair>=5.4
+pandas>=2.2,<3
+numpy>=1.26
+pyarrow>=15

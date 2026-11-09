@@ -1,0 +1,99 @@
+{
+  "exported": "2026-11-08",
+  "period": {
+    "start": "2022-01-01",
+    "end": "2026-11-01"
+  },
+  "hubs": [
+    "HB_NORTH",
+    "HB_WEST",
+    "HB_SOUTH",
+    "HB_HOUSTON",
+    "HB_PAN"
+  ],
+  "interval_hub": "HB_NORTH",
+  "battery": {
+    "power_mw": 100.0,
+    "energy_mwh": 200.0,
+    "round_trip_efficiency": 0.85,
+    "degradation_cost_per_mwh": 10.0
+  },
+  "lookahead_lead_minutes": 35,
+  "sources": {
+    "HB_NORTH": {
+      "mpc_da": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_gbm": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_gbm_c": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_oracle_1h": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_rtd": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_spike": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "mpc_spike_c": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "perfect_rt": "HB_NORTH_2022-01-01_2026-11-01_963fb8dc9e",
+      "da_informed": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_analog": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_ar1": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_gbm_1h": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_gbm_f": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_oracle": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_oracle_4h": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_oracle_spike": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_oracle_timing": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "mpc_spike_f": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "naive": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "perfect_da": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "sdp": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "smpc_analog": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "smpc_analog_1h": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "smpc_analog_4h": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865",
+      "smpc_analog_rt": "HB_NORTH_2022-01-01_2026-11-01_b3c26c7865"
+    },
+    "HB_WEST": {
+      "mpc_da": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_gbm": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_gbm_c": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_oracle_1h": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_rtd": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_spike": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_spike_c": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "perfect_rt": "HB_WEST_2022-01-01_2026-11-01_054c1a6cb2",
+      "mpc_oracle_spike": "HB_WEST_2022-01-01_2026-11-01_8530615562",
+      "mpc_oracle_timing": "HB_WEST_2022-01-01_2026-11-01_8530615562"
+    },
+    "HB_SOUTH": {
+      "mpc_da": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_gbm": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_gbm_c": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_oracle_1h": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_rtd": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_spike": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_spike_c": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "perfect_rt": "HB_SOUTH_2022-01-01_2026-11-01_9a600ba976",
+      "mpc_oracle_spike": "HB_SOUTH_2022-01-01_2026-11-01_d2ef6b582c",
+      "mpc_oracle_timing": "HB_SOUTH_2022-01-01_2026-11-01_d2ef6b582c"
+    },
+    "HB_HOUSTON": {
+      "mpc_da": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_gbm": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_gbm_c": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_oracle_1h": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_rtd": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_spike": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_spike_c": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "perfect_rt": "HB_HOUSTON_2022-01-01_2026-11-01_92bd126281",
+      "mpc_oracle_spike": "HB_HOUSTON_2022-01-01_2026-11-01_f73ca8b3d6",
+      "mpc_oracle_timing": "HB_HOUSTON_2022-01-01_2026-11-01_f73ca8b3d6"
+    },
+    "HB_PAN": {
+      "mpc_da": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_gbm": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_gbm_c": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_oracle_1h": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_rtd": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_spike": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_spike_c": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "perfect_rt": "HB_PAN_2022-01-01_2026-11-01_176e43f745",
+      "mpc_oracle_spike": "HB_PAN_2022-01-01_2026-11-01_25d8200583",
+      "mpc_oracle_timing": "HB_PAN_2022-01-01_2026-11-01_25d8200583"
+    }
+  }
+}

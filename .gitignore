@@ -1,0 +1,18 @@
+# Environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Downloaded data and backtest outputs are reproducible from the CLI. The leading slash keeps
+# these to the top-level folders: without it, `data/` would also hide src/batt/data/.
+/data/
+/results/
+.env
+
+# Machine-specific dev-server settings for the Claude desktop app.
+/.claude/launch.json

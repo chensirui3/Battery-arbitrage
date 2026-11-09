@@ -1,0 +1,207 @@
+# Every modeling assumption lives here so each result can be traced to what produced it.
+# Times are ERCOT Central Prevailing Time unless a field name ends in _utc.
+
+data:
+  dir: data
+  years: [2021, 2022, 2023, 2024, 2025, 2026]   # 2021 is history only (policies look back)
+
+battery:
+  power_mw: 100
+  energy_mwh: 200                 # 2-hour battery
+  round_trip_efficiency: 0.85     # AC to AC
+  soc_min_frac: 0.0
+  soc_max_frac: 1.0
+  soc_initial_frac: 0.5           # also the end-of-day / end-of-horizon target
+  degradation_cost_per_mwh: 10    # $ per MWh discharged
+  max_cycles_per_day: null        # null = no hard cap; degradation cost limits cycling
+
+timing:
+  timezone: America/Chicago
+  interval_minutes: 15
+  rt_publish_delay_minutes: 5     # RT price visible this long after its interval ends
+  decision_lead_minutes: 5        # actions are committed this long before the interval starts
+  da_publish_local_time: "13:30"  # DA prices for day D post at this time on day D-1
+  da_bid_deadline_local_time: "10:00"
+
+optimizer:
+  exclusive: auto                 # auto | lp | milp  (no simultaneous charge + discharge)
+
+backtest:
+  location: HB_NORTH
+  start: 2022-01-01               # first operating day (inclusive)
+  end: 2026-11-01                 # last operating day (exclusive)
+  policies:
+    # Oracles (see the future; upper bounds)
+    - perfect_rt                  # realized RT prices, solved a month at a time
+    - mpc_oracle                  # realized RT prices, but only over the MPC horizon
+    - mpc_oracle_4h               # realized RT prices for the next 4 hours, DA prices beyond
+    - mpc_oracle_1h               # ... for the next hour only
+    - mpc_oracle_spike            # ... next hour, only where RT is a spike (|RT - DA| > $100)
+    - mpc_oracle_timing           # ... knows which of the next hour's intervals spike, not how much
+    - perfect_da                  # realized DA prices, settled day-ahead
+    # Re-plan every 15 minutes from a point forecast
+    - mpc_da                      # DA prices
+    - mpc_ar1                     # DA + decaying latest RT-DA spread
+    - mpc_gbm                     # LightGBM forecast
+    - mpc_gbm_f                   # ... plus ERCOT load/wind/solar forecasts (needs fundamentals)
+    - mpc_gbm_1h                  # ... used for the next hour only, DA prices after
+    - mpc_spike                   # DA prices, moved for the next hour by a spike nowcast
+    - mpc_spike_f                 # ... whose classifier also sees ERCOT's forecasts
+    - mpc_analog                  # average of the analog scenarios
+    # Plan against uncertainty
+    - smpc_analog                 # two-stage stochastic MPC on analog scenarios
+    - smpc_analog_1h              # ... sharing one plan across scenarios for the first hour
+    - smpc_analog_4h              # ... for the first 4 hours
+    - smpc_analog_rt              # ... scenarios anchored to the latest RT spread
+    - sdp                         # stochastic dynamic programming, Markov spread model
+    # Plan once a day
+    - da_informed                 # from DA prices
+    - naive                       # from the last 30 days' average daily shape
+  benchmark: perfect_rt           # capture rate denominator
+  baseline: mpc_da                # bootstrap confidence intervals are relative to this policy
+  results_dir: results
+
+policy_params:
+  perfect_rt:
+    window: month                 # solve perfect foresight one month at a time
+  naive:
+    lookback_days: 30
+  # mpc_*: replan_every (intervals between re-plans, default 1)
+  # smpc_*, mpc_analog: fine_hours (15-min steps before hourly ones, default 4),
+  #   shared_hours (one plan for all scenarios over this first stretch, default 0.25)
+  sdp:
+    fit_days: 90                  # Markov spread model fit on the last 90 days, monthly
+  # Named variants: `policy:` picks the registered policy, the rest are its settings.
+  mpc_oracle_4h:
+    policy: mpc_oracle
+    forecaster_params: {hours: 4}
+  mpc_oracle_1h:
+    policy: mpc_oracle
+    forecaster_params: {hours: 1}
+  smpc_analog_1h:
+    policy: smpc_analog
+    shared_hours: 1
+  smpc_analog_4h:
+    policy: smpc_analog
+    shared_hours: 4
+  mpc_gbm_f:                      # skipped unless fundamentals cover the backtest period
+    policy: mpc_gbm
+    forecaster_params: {fundamentals: true}
+  mpc_gbm_1h:
+    policy: mpc_gbm
+    forecaster_params: {hours: 1}
+  mpc_oracle_timing:
+    policy: mpc_oracle_spike
+    forecaster_params: {perfect: timing}
+  mpc_spike_f:                    # skipped unless fundamentals cover the backtest period
+    policy: mpc_spike
+    forecaster_params: {fundamentals: true}
+  # Spike nowcast variants, not in the default list (run with --policies):
+  mpc_spike_raw:                  # DA + p_up * size_up - p_down * size_down for the next hour
+    policy: mpc_spike
+    forecaster_params: {adjust: raw}
+  mpc_spike_news:                 # ... each probability minus what the DA prices implied
+    policy: mpc_spike
+    forecaster_params: {adjust: news}
+  mpc_spike_regime:               # ... only while the latest published price is a spike
+    policy: mpc_spike
+    forecaster_params: {adjust: regime}
+  mpc_spike_50:
+    policy: mpc_spike
+    forecaster_params: {threshold: 50}
+  mpc_spike_250:
+    policy: mpc_spike
+    forecaster_params: {threshold: 250}
+  # Grid conditions (docs/grid-conditions-plan.md), not in the default list (run with --policies):
+  mpc_rtd_all_none:               # ERCOT's look-ahead for every covered interval, as published
+    policy: mpc_rtd
+    forecaster_params: {mode: all, basis: none}
+  mpc_rtd_all_latest:             # ... plus the latest hub-minus-SCED price gap
+    policy: mpc_rtd
+    forecaster_params: {mode: all, basis: latest}
+  mpc_rtd_spikes_none:            # ... only where it is more than $100 from DA
+    policy: mpc_rtd
+    forecaster_params: {mode: spikes, basis: none}
+  mpc_rtd_spikes_latest:
+    policy: mpc_rtd
+    forecaster_params: {mode: spikes, basis: latest}
+  mpc_gbm_c:                      # LightGBM + reserves, 5-minute prices, look-ahead, outages
+    policy: mpc_gbm
+    forecaster_params: {conditions: true}
+  mpc_spike_c:
+    policy: mpc_spike
+    forecaster_params: {conditions: true}
+  mpc_oracle_spike_25:            # how the spike oracle's value depends on the spike threshold
+    policy: mpc_oracle_spike
+    forecaster_params: {threshold: 25}
+  mpc_oracle_spike_50:
+    policy: mpc_oracle_spike
+    forecaster_params: {threshold: 50}
+  mpc_oracle_spike_250:
+    policy: mpc_oracle_spike
+    forecaster_params: {threshold: 250}
+  mpc_oracle_spike_500:
+    policy: mpc_oracle_spike
+    forecaster_params: {threshold: 500}
+  mpc_oracle_spike_1000:
+    policy: mpc_oracle_spike
+    forecaster_params: {threshold: 1000}
+
+forecasters:                      # used by the MPC policies and by `batt forecast`
+  ar1:
+    fit_days: 90                  # AR(1) fit on the last 90 days of 15-min RT-DA spreads
+    refit: month
+  gbm:
+    refit: month                  # retrained at the start of every month...
+    train_days: 730               # ...on the two years of data public at that moment
+    num_boost_round: 300
+    label_clip: 1000              # winsorize spread labels at +/- $1,000/MWh (null: off)
+  qgbm:                           # quantile LightGBM, conformally calibrated
+    levels: [0.05, 0.25, 0.5, 0.75, 0.95]
+    refit: month
+    train_days: 730               # the last 60 of these days are held out for calibration
+    calib_days: 60
+    num_boost_round: 200
+  analog:                         # DA + RT-DA spread paths of the 20 most similar past days
+    n_scenarios: 20
+    pool_days: 365
+  analog_rt:                      # same, anchored to the latest observed spread
+    n_scenarios: 20
+    pool_days: 365
+    fit_days: 90
+  spike:                          # next-hour spike nowcast (batt.forecast.spike)
+    threshold: 100                # a spike: RT more than $100/MWh above (or below) DA
+    hours: 1                      # nowcast horizon; DA prices after it
+    adjust: regime                # raw | news | regime; chosen on Jul-Dec 2021 (see docs/)
+    refit: month                  # LightGBM classifiers, refit like gbm...
+    train_days: 730               # ...on the two years of data public at that moment
+    num_boost_round: 300
+    label_clip: 1000              # spike sizes winsorized at $1,000/MWh, like gbm's labels
+    min_positives: 200            # fewer spike examples than this: keep the previous fit
+  rtd:                            # ERCOT's one-hour look-ahead (batt.forecast.lookahead)
+    mode: spikes                  # all | spikes; both chosen on Jul-Dec 2021 (see docs/)
+    basis: none                   # none | latest
+    threshold: 100                # mode spikes: use RTD only where it is this far from DA
+    hours: 1
+  # Named variants: `forecaster:` picks the base, whose settings above are the starting point.
+  gbm_f:                          # gbm + ERCOT load/wind/solar forecasts (batt.data.fundamentals)
+    forecaster: gbm
+    fundamentals: true
+  qgbm_f:
+    forecaster: qgbm
+    fundamentals: true
+  spike_f:
+    forecaster: spike
+    fundamentals: true
+  gbm_c:                          # gbm + ERCOT grid conditions (batt.data.conditions)
+    forecaster: gbm
+    conditions: true
+  qgbm_c:
+    forecaster: qgbm
+    conditions: true
+  spike_c:
+    forecaster: spike
+    conditions: true
+  rtd_all:                        # the look-ahead as published, for scoring as a forecast
+    forecaster: rtd
+    mode: all

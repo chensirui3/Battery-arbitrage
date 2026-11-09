@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ercot-battery-arbitrage"
+version = "0.1.0"
+description = "Forecast-driven battery arbitrage on the ERCOT grid: price forecasting, LP dispatch, and leakage-safe backtesting."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2,<3",
+    "scipy>=1.11",
+    "highspy>=1.8",
+    "lightgbm>=4.3",
+    "pyarrow>=15",
+    "pydantic>=2.6",
+    "pyyaml>=6",
+    "requests>=2.31",  # ERCOT's yearly price files (batt.data.ercot)
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+# ERCOT downloads go through the open-source gridstatus library.
+data = ["gridstatus>=0.30"]
+dev = ["pytest>=8", "hypothesis>=6.100", "ruff>=0.5"]
+# The README figures (scripts/make_figures.py).
+figures = ["matplotlib>=3.8"]
+# The interactive dashboard (dashboard/app.py; dashboard/requirements.txt for deploying it).
+dashboard = ["streamlit>=1.50", "altair>=5.4"]
+
+[project.scripts]
+batt = "batt.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
